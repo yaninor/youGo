@@ -1,4 +1,5 @@
 <script>
+import '../static/iconfont.wxss'
 export default {};
 </script>
 
