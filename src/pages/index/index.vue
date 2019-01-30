@@ -27,6 +27,10 @@
         </div>
       </div>
     </div>
+    <div class="bottom-line">
+      <i class="iconfont icon-xiao"></i>
+      <span>我是有底线的</span>
+    </div>
     <toTop></toTop>
   </div>
 </template>
@@ -179,6 +183,20 @@ $uRed: #ff2d4a;
         }
       }
     }
+  }
+}
+.bottom-line {
+  display: flex;
+  color: #999;
+  justify-content: center;
+  align-items: center;
+  height: 100rpx;
+  background-color: #f4f4f4;
+  i {
+    font-size: 24rpx;
+  }
+  span {
+    font-size: 24rpx;
   }
 }
 </style>

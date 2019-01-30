@@ -1,9 +1,6 @@
 <template>
   <div>
-    <div class="bottom-line">
-      <i class="iconfont icon-xiao"></i>
-      <span>我是有底线的</span>
-    </div>
+    
     <div class="toTop" v-show="isShow" @click="toTop">
       <i class="iconfont icon-jiantoushang"></i>
       <p>顶部</p>
@@ -31,20 +28,7 @@ export default {
 };
 </script>
 <style scoped lang="scss">
-.bottom-line {
-  display: flex;
-  color: #999;
-  justify-content: center;
-  align-items: center;
-  height: 100rpx;
-  background-color: #f4f4f4;
-  i {
-    font-size: 24rpx;
-  }
-  span {
-    font-size: 24rpx;
-  }
-}
+
 .toTop {
   width: 90rpx;
   height: 90rpx;

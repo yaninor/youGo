@@ -84,7 +84,7 @@ export default {
         goods_id: options.goods_id
       }
     });
-    console.log(res);
+    // console.log(res);
     this.goodsInfo = res.data.message;
   }
 };

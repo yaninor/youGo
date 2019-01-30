@@ -34,8 +34,8 @@
 				{
 					"id": 0,
 					"name": "去我的",
-					"pathName": "pages/detail/main",
-					"query": "goods_id=890",
+					"pathName": "pages/mine/main",
+					"query": "",
 					"scene": null
 				}
 			]

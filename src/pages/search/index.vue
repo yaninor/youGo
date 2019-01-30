@@ -2,24 +2,24 @@
   <div class="search-container">
     <div class="search">
       <icon type="search" size="15"></icon>
-      <input type="text" placeholder="请输入你想要的商品" v-model.trim="inputValue" @change="getInputValue">
+      <input type="text" placeholder="请输入你想要的商品" v-model.trim="inputValue" @confirm="getInputValue" @focus="isShow=true">
       <button @click="back">取消</button>
     </div>
-    <div class="history" v-if="resultList.length===0">
+    <div class="history" v-show="isShow">
       <div class="title">
         <h2>历史搜索</h2>
         <i class="iconfont icon-shanchu" @click="clear"></i>
       </div>
       <div class="history-item">
         <div class="item">
-          <p v-for="(item, index) in historyList" @click="query(item)">
+          <p v-for="(item, index) in searchList" @click="query(item)">
             {{item}}
             <i class="iconfont icon-shanchu" @click="delOne(index)"></i>
           </p>
         </div>
       </div>
     </div>
-    <div class="goods" v-else-if="resultList.length!=0">
+    <div class="goods" v-show="!isShow">
       <div class="sort">
         <p class="actived">综合</p>
         <p>销量</p>
@@ -60,8 +60,9 @@ export default {
   data() {
     return {
       inputValue: "",
-      historyList: [],
-      resultList: []
+      searchList: [],
+      resultList: [],
+      isShow:false
     };
   },
   components: {
@@ -74,15 +75,16 @@ export default {
         return;
       }
       //长度限制
-      if (this.historyList.length >= 10) {
-        this.historyList.shift();
+      if (this.searchList.length >= 10) {
+        this.searchList.shift();
       }
       //去重
-      if (this.historyList.indexOf(this.inputValue) != -1) {
-        this.historyList.splice(this.historyList.indexOf(this.inputValue), 1);
+      if (this.searchList.indexOf(this.inputValue) != -1) {
+        this.searchList.splice(this.searchList.indexOf(this.inputValue), 1);
       }
+      this.isShow = false;
       //添加记录
-      this.historyList.push(this.inputValue);
+      this.searchList.push(this.inputValue);
       let res = await hxios.get({
         url: "api/public/v1/goods/search?query=",
         data: {
@@ -98,10 +100,23 @@ export default {
       this.getInputValue();
     },
     delOne(index) {
-      this.historyList.splice(index, 1);
+      this.searchList.splice(index, 1);
     },
+    // 清空所有历史
     clear() {
-      this.historyList = [];
+      wx.showModal({
+        title: "提示",
+        content: "你确定要清空历史?O(∩_∩)O",
+        // 默认是 success(){} this已经改变 使用箭头函数 固定this
+        success: res => {
+          if (res.confirm) {
+            // console.log("用户点击确定");
+            this.searchList = [];
+          } else if (res.cancel) {
+            // console.log("用户点击取消");
+          }
+        }
+      });
     },
     back() {
       wx.navigateBack({
@@ -109,21 +124,29 @@ export default {
       });
     },
     getGoodsInfo(data) {
-      console.log(data);
+      // console.log(data);
       wx.navigateTo({ url: "/pages/detail/main?goods_id=" + data.goods_id });
     }
   },
+  // created 只要保证data有了即可
+  created() {
+    let res = wx.getStorageSync("history");
+    // console.log(res);
+    if (res) {
+      this.searchList = res;
+    }
+    this.isShow = true;
+  },
+  // 侦听器
   watch: {
-    historyList() {
+    searchList() {
+      // console.log("我变了");
       wx.setStorage({
         key: "history",
-        data: this.historyList
+        data: this.searchList
       });
     }
   },
-  created() {
-    this.historyList = wx.getStorageSync("history");
-  }
 };
 </script>
 
@@ -158,9 +181,8 @@ $uRed: #ff2d4a;
     margin-left: 20rpx;
     height: 58rpx;
     line-height: 58rpx;
-    background-color: #eee;
-    color: #aaa;
-    // padding: 0 20rpx;
+    background-color: $uRed;
+    color: #fff;
   }
 }
 .history {
@@ -168,8 +190,8 @@ $uRed: #ff2d4a;
   padding: 0 30rpx 0 16rpx;
   box-sizing: border-box;
   position: absolute;
-  top:120rpx;
-  left:0;
+  top: 120rpx;
+  left: 0;
   .title {
     height: 88rpx;
     position: relative;
@@ -309,4 +331,5 @@ $uRed: #ff2d4a;
     left: 0;
   }
 }
+
 </style>
