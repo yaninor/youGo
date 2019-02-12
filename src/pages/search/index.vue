@@ -70,7 +70,7 @@ export default {
       resultList: [],
       isShow: false,
       orderIndex: 0,
-      isUp: true,
+      isUp: true
     };
   },
   components: {
@@ -78,7 +78,6 @@ export default {
   },
   methods: {
     async getInputValue() {
-      console.log(this.inputValue);
       if (this.inputValue === "") {
         return;
       }
@@ -99,7 +98,7 @@ export default {
           query: this.inputValue
         }
       });
-      console.log(res);
+      // console.log(res);
       this.resultList = res.data.message.goods;
       this.inputValue = "";
     },
@@ -162,7 +161,7 @@ export default {
   //计算属性
   computed: {
     //列表排序
-    sortList(){
+    sortList() {
       if(this.orderIndex===0){
         return this.resultList;
       }else if(this.orderIndex===1){
@@ -178,8 +177,29 @@ export default {
           return b.goods_price - a.goods_price
         })
       }
+      // switch (this.orderIndex) {
+      //   case 0:
+      //     return this.resultList;
+      //     break;
+      //   case 1:
+      //     let newArr = JSON.parse(JSON.stringify(this.resultList));
+      //     return newArr.sort((a, b) => {
+      //       return a.goods_id - b.goods_id;
+      //     });
+      //     break;
+      //   case 2:
+      //     return newArr.sort((a, b) => {
+      //       newArr = JSON.parse(JSON.stringify(this.resultList));
+      //       if (this.isUp) {
+      //         return a.goods_price - b.goods_price;
+      //       } else {
+      //         return b.goods_price - a.goods_price;
+      //       }
+      //     })
+      //     break;
+      // }
     }
-  },
+  }
 };
 </script>
 
@@ -295,7 +315,7 @@ $uRed: #ff2d4a;
           transform: scaleY(0.5);
           top: 0;
           right: 75rpx;
-            color: #ccc;
+          color: #ccc;
 
           &:nth-child(1) {
             top: -5rpx;

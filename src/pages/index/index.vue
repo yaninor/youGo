@@ -117,7 +117,7 @@ $uRed: #ff2d4a;
     display: flex;
     padding-top: 24rpx;
     padding-bottom: 29rpx;
-    background-color: #fff;
+    background-color: #f7f5f6;
     .category-item {
       flex: 1;
       img {
@@ -134,6 +134,7 @@ $uRed: #ff2d4a;
     }
   }
   .floor-container {
+    background-color: #f7f5f6;
     .floor-item {
       .title {
         position: relative;
@@ -160,7 +161,7 @@ $uRed: #ff2d4a;
           position: relative;
           float: right;
           box-sizing: border-box;
-          border-radius: 10rpx;
+          border-radius: 5rpx;
           &:nth-child(1) {
             float: left;
             height: 390rpx;
@@ -176,9 +177,9 @@ $uRed: #ff2d4a;
             margin-bottom: 10rpx;
           }
           img {
-            width: 240rpx;
+            width: 235rpx;
             height: 190rpx;
-            border-radius: 10rpx;
+            border-radius: 5rpx;
           }
         }
       }

@@ -3,7 +3,7 @@
     <div class="swiper-container">
       <swiper indicator-dots autoplay circular indicator-active-color="#fff">
         <swiper-item v-for="item in goodsInfo.pics" :key="item.pics_id">
-          <img :src="item.pics_mid" @click="preview(goodsInfo.pics)">
+          <img :src="item.pics_mid_url" @click="preview(item.pics_big_url)">
         </swiper-item>
       </swiper>
     </div>
@@ -42,12 +42,17 @@
       </div>
       <div class="details">
         <div class="top">
-          <div class="intro actived">图文介绍</div>
-          <div class="options">规格参数</div>
+          <div class="intro" :class="{active:index===0}" @click="index=0">图文介绍</div>
+          <div class="options" :class="{active:index===1}" @click="index=1">规格参数</div>
         </div>
         <div class="bottom">
-          <span>{{goodsInfo.goods_name}}</span>
-          <img :src="item.pics_mid" alt v-for="(item, index) in goodsInfo.pics" :key="item.pics_id">
+          <div class="content" v-html="goodsInfo.goods_introduce" v-show="index===0"></div>
+          <div class="content" v-show="index===1">
+            <div class="parameter" v-for="(item, index) in goodsInfo.attrs" :key="item.attr_id">
+              <div class="parameter-name">{{item.attr_name}}</div>
+              <div class="parameter-value">{{item.attr_value}}</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -55,7 +60,7 @@
       <div class="tool1">
         <i class="iconfont icon-kefu"></i>联系客服
       </div>
-      <div class="tool2">
+      <div class="tool2" @click="toCart">
         <i class="iconfont icon-gouwuche"></i>购物车
       </div>
       <div class="tool3">加入购物车</div>
@@ -72,8 +77,8 @@ export default {
   data() {
     return {
       goodsInfo: {},
-      picList:[],
-      address:'广东省 广东市 海珠区'
+      address: "",
+      index: 0
     };
   },
   components: {
@@ -81,6 +86,7 @@ export default {
   },
   async onLoad(options) {
     // console.log(options.goods_id);
+    //获取商品详情
     let res = await hxios.get({
       url: "api/public/v1/goods/detail",
       data: {
@@ -89,35 +95,57 @@ export default {
     });
     // console.log(res);
     this.goodsInfo = res.data.message;
+    //读取缓存地址
+    wx.getStorage({
+      key: "address",
+      success: res => {
+        this.address =
+          res.data.provinceName +
+          "　" +
+          res.data.cityName +
+          "　" +
+          res.data.countyName;
+      }
+    });
   },
   methods: {
-    preview(imgUrl) {
-      imgUrl.forEach(v=>{
-        this.picList.push(v.pics_mid)
-      })
+    //大图预览
+    preview(pics_big_url) {
+      let picList = this.goodsInfo.pics.map(v => v.pics_big_url);
       // console.log(this.picList);
       wx.previewImage({
-        current: this.picList[0], // 当前显示图片的http链接
-        urls: this.picList // 需要预览的图片http链接列表
-      });     
+        current: pics_big_url, // 当前显示图片的http链接
+        urls: picList // 需要预览的图片http链接列表
+      });
     },
+    //获取地址
     getAddress() {
       wx.chooseAddress({
-        success:(res)=> {
-          console.log(res.provinceName);
-          console.log(res.cityName);
-          console.log(res.countyName);
-          this.address = res.provinceName+'　'+res.cityName+'　'+res.countyName;
+        success: res => {
+          // console.log(res.provinceName);
+          // console.log(res.cityName);
+          // console.log(res.countyName);
+          this.address =
+            res.provinceName + "　" + res.cityName + "　" + res.countyName;
+          //缓存地址
+          wx.setStorage({
+            key: "address",
+            data: res
+          });
         }
       });
     },
+    //去购物车
+    toCart(){
+      wx.switchTab({ url: '/pages/cart/main' });
+    }
   }
 };
 </script>
 
 <style scoped lang="scss">
 $uRed: #ff2d4a;
-page {
+.detail-container {
   background-color: #f4f4f4;
   padding-bottom: 100rpx;
   box-sizing: border-box;
@@ -156,11 +184,13 @@ page {
     padding: 40rpx 0 40rpx 20rpx;
     box-sizing: border-box;
     color: $uRed;
+    font-weight: 600;
   }
   .title {
     width: 100%;
     display: flex;
     height: 80rpx;
+    font-weight: 500;
     .name {
       height: 100%;
       flex: 1;
@@ -232,13 +262,12 @@ page {
   }
   .details {
     box-sizing: border-box;
-    padding: 0 10rpx;
+    padding: 0 20rpx;
     margin-top: 20rpx;
     width: 100%;
     .top {
       height: 100rpx;
       display: flex;
-      font-size: 28rpx;
       text-align: center;
       line-height: 100rpx;
       .intro {
@@ -247,16 +276,35 @@ page {
       .options {
         flex: 1;
       }
-      .actived {
+      .active {
         color: $uRed;
         box-sizing: border-box;
         border-bottom: 10rpx solid $uRed;
       }
     }
     .bottom {
-      img {
-        width: 100%;
-        height: 720rpx;
+      .content {
+        margin-top: 12rpx;
+        .parameter {
+          display: flex;
+          font-size: 28rpx;
+          height: 85rpx;
+          line-height: 85rpx;
+          position: relative;
+          margin-top:-2rpx;
+          .parameter-name {
+            flex: 1;
+            text-align: center;
+            border: 2rpx solid #ccc;
+          }
+          .parameter-value {
+            flex: 1;
+            border: 2rpx solid #ccc;
+            position: relative;
+            margin-left: -2rpx;
+            padding-left: 40rpx;
+          }
+        }
       }
     }
   }
@@ -271,7 +319,7 @@ page {
   background-color: #fff;
   text-align: center;
   .tool1 {
-    flex: 1;
+    flex: 2;
     font-size: 24rpx;
     padding-top: 10rpx;
     i {
@@ -279,7 +327,7 @@ page {
     }
   }
   .tool2 {
-    flex: 1;
+    flex: 2;
     padding-top: 10rpx;
     font-size: 24rpx;
     i {
@@ -287,7 +335,7 @@ page {
     }
   }
   .tool3 {
-    flex: 1;
+    flex: 3;
     line-height: 100rpx;
     background-color: #ffb400;
     font-size: 28rpx;
@@ -295,7 +343,7 @@ page {
   }
   .tool4 {
     line-height: 100rpx;
-    flex: 1;
+    flex: 3;
     font-size: 28rpx;
     background-color: $uRed;
     color: #fff;
