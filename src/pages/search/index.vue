@@ -2,7 +2,13 @@
   <div class="search-container">
     <div class="search">
       <icon type="search" size="15"></icon>
-      <input type="text" placeholder="请输入你想要的商品" v-model.trim="inputValue" @confirm="getInputValue" @focus="isShow=true">
+      <input
+        type="text"
+        placeholder="请输入你想要的商品"
+        v-model.trim="inputValue"
+        @confirm="getInputValue"
+        @focus="isShow=true"
+      >
       <button @click="back">取消</button>
     </div>
     <div class="history" v-show="isShow">
@@ -21,18 +27,18 @@
     </div>
     <div class="goods" v-show="!isShow">
       <div class="sort">
-        <p class="actived">综合</p>
-        <p>销量</p>
-        <p>
+        <p :class="{active:orderIndex===0}" @click="orderIndex=0">综合</p>
+        <p :class="{active:orderIndex===1}" @click="orderIndex=1">销量</p>
+        <p :class="{active:orderIndex===2}" @click="orderIndex=2;isUp=!isUp">
           价格
-          <span>▲</span>
-          <span>▼</span>
+          <span :class="{active:orderIndex===2&&isUp}">▲</span>
+          <span :class="{active:orderIndex===2&&!isUp}">▼</span>
         </p>
       </div>
       <div class="goods-item">
         <div
           class="item"
-          v-for="(item, index) in resultList"
+          v-for="(item, index) in sortList"
           :key="item.goods_id"
           @click="getGoodsInfo(item)"
         >
@@ -62,7 +68,9 @@ export default {
       inputValue: "",
       searchList: [],
       resultList: [],
-      isShow:false
+      isShow: false,
+      orderIndex: 0,
+      isUp: true,
     };
   },
   components: {
@@ -95,10 +103,12 @@ export default {
       this.resultList = res.data.message.goods;
       this.inputValue = "";
     },
+    //查询商品
     async query(value) {
       this.inputValue = value;
       this.getInputValue();
     },
+    //删除一条记录
     delOne(index) {
       this.searchList.splice(index, 1);
     },
@@ -118,11 +128,13 @@ export default {
         }
       });
     },
+    //返回上一页
     back() {
       wx.navigateBack({
         delta: 1 //返回的页面数，如果 delta 大于现有页面数，则返回到首页,
       });
     },
+    // 获取商品信息
     getGoodsInfo(data) {
       // console.log(data);
       wx.navigateTo({ url: "/pages/detail/main?goods_id=" + data.goods_id });
@@ -145,6 +157,27 @@ export default {
         key: "history",
         data: this.searchList
       });
+    }
+  },
+  //计算属性
+  computed: {
+    //列表排序
+    sortList(){
+      if(this.orderIndex===0){
+        return this.resultList;
+      }else if(this.orderIndex===1){
+       return this.resultList.slice(0).sort((a,b)=>{
+         return a.goods_id - b.goods_id;
+       })
+      }else if(this.orderIndex===2&&this.isUp){
+        return this.resultList.slice(0).sort((a,b)=>{
+          return a.goods_price - b.goods_price;
+        })
+      }else if(this.orderIndex===2&&!this.isUp){
+        return this.resultList.slice(0).sort((a,b)=>{
+          return b.goods_price - a.goods_price
+        })
+      }
     }
   },
 };
@@ -249,7 +282,7 @@ $uRed: #ff2d4a;
       text-align: center;
       width: 100%;
       height: 100%;
-      &.actived {
+      &.active {
         color: $uRed;
       }
       &:last-child {
@@ -262,13 +295,17 @@ $uRed: #ff2d4a;
           transform: scaleY(0.5);
           top: 0;
           right: 75rpx;
+            color: #ccc;
+
           &:nth-child(1) {
             top: -5rpx;
-            color: #ccc;
           }
           &:nth-child(2) {
             top: 10rpx;
           }
+        }
+        .active {
+          color: $uRed;
         }
       }
     }
@@ -331,5 +368,4 @@ $uRed: #ff2d4a;
     left: 0;
   }
 }
-
 </style>

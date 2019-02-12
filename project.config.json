@@ -34,8 +34,8 @@
 				{
 					"id": 0,
 					"name": "去我的",
-					"pathName": "pages/mine/main",
-					"query": "",
+					"pathName": "pages/search/main",
+					"query": "query=%E5%A5%B3%E8%A3%85",
 					"scene": null
 				}
 			]

@@ -3,7 +3,7 @@
     <div class="swiper-container">
       <swiper indicator-dots autoplay circular indicator-active-color="#fff">
         <swiper-item v-for="item in goodsInfo.pics" :key="item.pics_id">
-          <img :src="item.pics_mid">
+          <img :src="item.pics_mid" @click="preview(goodsInfo.pics)">
         </swiper-item>
       </swiper>
     </div>
@@ -33,8 +33,9 @@
       <div class="item2">
         <div class="address">
           送至
-          <span>
-            广东省 广东市 海珠区
+          <span @click="getAddress">
+            <!-- 广东省 广东市 海珠区 -->
+            {{address}}
             <i class="iconfont icon-jiantouyou"></i>
           </span>
         </div>
@@ -70,7 +71,9 @@ import toTop from "../../components/toTop";
 export default {
   data() {
     return {
-      goodsInfo: {}
+      goodsInfo: {},
+      picList:[],
+      address:'广东省 广东市 海珠区'
     };
   },
   components: {
@@ -86,6 +89,28 @@ export default {
     });
     // console.log(res);
     this.goodsInfo = res.data.message;
+  },
+  methods: {
+    preview(imgUrl) {
+      imgUrl.forEach(v=>{
+        this.picList.push(v.pics_mid)
+      })
+      // console.log(this.picList);
+      wx.previewImage({
+        current: this.picList[0], // 当前显示图片的http链接
+        urls: this.picList // 需要预览的图片http链接列表
+      });     
+    },
+    getAddress() {
+      wx.chooseAddress({
+        success:(res)=> {
+          console.log(res.provinceName);
+          console.log(res.cityName);
+          console.log(res.countyName);
+          this.address = res.provinceName+'　'+res.cityName+'　'+res.countyName;
+        }
+      });
+    },
   }
 };
 </script>
