@@ -18,7 +18,7 @@
       </div>
       <div class="history-item">
         <div class="item">
-          <p v-for="(item, index) in searchList" @click="query(item)">
+          <p v-for="(item, index) in searchList" @click="query(item)" :key="item.goods_id">
             {{item}}
             <i class="iconfont icon-shanchu" @click="delOne(index)"></i>
           </p>
@@ -98,7 +98,7 @@ export default {
           query: this.inputValue
         }
       });
-      // console.log(res);
+      console.log(res);
       this.resultList = res.data.message.goods;
       this.inputValue = "";
     },

@@ -63,7 +63,7 @@
       <div class="tool2" @click="toCart">
         <i class="iconfont icon-gouwuche"></i>购物车
       </div>
-      <div class="tool3">加入购物车</div>
+      <div class="tool3" @click="add2cart(goodsInfo.goods_id)">加入购物车</div>
       <div class="tool4">立即购买</div>
     </div>
     <toTop></toTop>
@@ -93,8 +93,8 @@ export default {
         goods_id: options.goods_id
       }
     });
-    // console.log(res);
     this.goodsInfo = res.data.message;
+    console.log(res);
     //读取缓存地址
     wx.getStorage({
       key: "address",
@@ -136,8 +136,45 @@ export default {
       });
     },
     //去购物车
-    toCart(){
-      wx.switchTab({ url: '/pages/cart/main' });
+    toCart() {
+      wx.switchTab({ url: "/pages/cart/main" });
+    },
+    //加入购物车
+    add2cart(id){
+      wx.getStorage({
+        key: 'cart',
+        success: (res) => {
+          // console.log(res.data)
+          //判断是否有商品数据 有就累加 没有就设置为1
+          if(res.data[id]){
+            res.data[id]++;
+          }else{
+            res.data[id] = 1;
+          }
+          wx.setStorage({
+            key: 'cart',
+            data: res.data
+          });
+        },
+        fail: () => {
+          //没有商品数据就添加
+          let cartData = {};
+          cartData[id] = 1;
+          wx.setStorage({
+            key: 'cart',
+            data: cartData
+          });
+         },
+        complete: () => { 
+          wx.showToast({
+            title: '添加成功', //提示的内容,
+            icon: 'success', //图标,
+            duration: 2000, //延迟时间,
+            mask: true, //显示透明蒙层，防止触摸穿透,
+            success: res => {}
+          });
+        }
+      })
     }
   }
 };
@@ -262,7 +299,7 @@ $uRed: #ff2d4a;
   }
   .details {
     box-sizing: border-box;
-    padding: 0 20rpx;
+    padding: 0 15rpx;
     margin-top: 20rpx;
     width: 100%;
     .top {
@@ -283,6 +320,7 @@ $uRed: #ff2d4a;
       }
     }
     .bottom {
+      padding-bottom: 40rpx;
       .content {
         margin-top: 12rpx;
         .parameter {
@@ -291,7 +329,7 @@ $uRed: #ff2d4a;
           height: 85rpx;
           line-height: 85rpx;
           position: relative;
-          margin-top:-2rpx;
+          margin-top: -2rpx;
           .parameter-name {
             flex: 1;
             text-align: center;
